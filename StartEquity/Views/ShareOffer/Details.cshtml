@@ -1,0 +1,130 @@
+@{
+    ViewData["Title"] = "Share Offer Details";
+}
+
+<div class="container-fluid">
+    <h2>Share Offer Details</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>@ViewBag.Offer.Company.Name - Share Offer</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Seller Information</h5>
+                            <p><strong>Name:</strong> @ViewBag.Offer.Seller.User.FullName</p>
+                            <p><strong>Email:</strong> @ViewBag.Offer.Seller.User.Email</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Offer Details</h5>
+                            <p><strong>Shares Available:</strong> @ViewBag.Offer.SharePercentage.ToString("F2")%</p>
+                            <p><strong>Ask (per 1%):</strong> ₹@ViewBag.Offer.AskingPrice.ToString("N2")</p>
+                            <p><strong>Total Value (@ViewBag.Offer.SharePercentage.ToString("F2")%):</strong> ₹@ViewBag.Offer.TotalValue.ToString("N2")</p>
+                            <p><strong>Listed Date:</strong> @ViewBag.Offer.CreatedAt.ToString("dd-MM-yyyy HH:mm")</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Company Information</h5>
+                            <p><strong>Company:</strong> @ViewBag.Offer.Company.Name</p>
+                            <p><strong>Description:</strong> @ViewBag.Offer.Company.Description</p>
+                            <p><strong>Market Value (per 1%):</strong> ₹@ViewBag.Offer.CurrentMarketPrice.ToString("N2")</p>
+                        </div>
+                        
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(ViewBag.Offer.Description))
+                    {
+                        <div class="mb-3">
+                            <h5>Seller's Description</h5>
+                            <p class="text-muted">@ViewBag.Offer.Description</p>
+                        </div>
+                    }
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Your Account</h5>
+                            <p><strong>Current Balance:</strong> ₹@ViewBag.Buyer.Balance.ToString("N2")</p>
+                            @if (ViewBag.Buyer.Balance >= ViewBag.Offer.TotalValue)
+                            {
+                                <div class="alert alert-success">
+                                    <strong>✓ Sufficient Balance</strong><br>
+                                    You have enough funds to purchase these shares.
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-danger">
+                                    <strong>✗ Insufficient Balance</strong><br>
+                                    You need ₹@((ViewBag.Offer.TotalValue - ViewBag.Buyer.Balance).ToString("N2")) more to purchase these shares.
+                                </div>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Purchase Summary</h5>
+                            <p><strong>Shares to Buy:</strong> @ViewBag.Offer.SharePercentage.ToString("F2")%</p>
+                            <p><strong>Ask (per 1%):</strong> ₹@ViewBag.Offer.AskingPrice.ToString("N2")</p>
+                            <p><strong>Market Value (per 1%):</strong> ₹@ViewBag.Offer.CurrentMarketPrice.ToString("N2")</p>
+                            <p><strong>Total Cost:</strong> ₹@ViewBag.Offer.TotalValue.ToString("N2")</p>
+                            <p><strong>Remaining Balance:</strong> ₹@((ViewBag.Buyer.Balance - ViewBag.Offer.TotalValue).ToString("N2"))</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Purchase Actions</h4>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.IsSeller)
+                    {
+                        <button type="button" class="btn btn-secondary btn-lg btn-block mb-3" disabled>
+                            This is your offer
+                        </button>
+                    }
+                    else if (ViewBag.Buyer.Balance >= ViewBag.Offer.TotalValue)
+                    {
+                        <form asp-action="Buy" method="post">
+                            <input type="hidden" name="offerId" value="@ViewBag.Offer.Id" />
+                            <button type="submit" class="btn btn-success btn-lg btn-block mb-3" 
+                                    onclick="return confirm('Are you sure you want to purchase these shares?')">
+                                Buy Shares Now
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-secondary btn-lg btn-block mb-3" disabled>
+                            Insufficient Balance
+                        </button>
+                    }
+                    
+                    <a asp-action="Index" class="btn btn-outline-primary btn-block">Back to Market</a>
+                    <a asp-controller="Investor" asp-action="Portfolio" class="btn btn-outline-secondary btn-block">My Portfolio</a>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4>Important Notes</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">• Purchase is immediate and cannot be undone</li>
+                        <li class="mb-2">• You will receive the exact percentage of shares listed</li>
+                        <li class="mb-2">• Payment will be deducted from your account balance</li>
+                        <li class="mb-2">• The seller will receive the payment immediately</li>
+                        <li class="mb-2">• New shares will appear in your portfolio</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

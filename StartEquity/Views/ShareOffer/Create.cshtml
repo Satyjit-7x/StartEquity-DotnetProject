@@ -1,0 +1,84 @@
+@{
+    ViewData["Title"] = "Sell Shares";
+}
+
+<div class="container-fluid">
+    <h2>Sell Shares - @ViewBag.Investment.Company.Name</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Create Share Offer</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5>Investment Details</h5>
+                        <p><strong>Company:</strong> @ViewBag.Investment.Company.Name</p>
+                        <p><strong>Your Current Equity:</strong> @ViewBag.Investment.EquityPercent.ToString("F2")%</p>
+                        <p><strong>Original Investment:</strong> ₹@ViewBag.Investment.Amount.ToString("N2")</p>
+                        <p><strong>Current Market Price:</strong> ₹@(ViewBag.Investment.Company.CurrentRound?.ValuationAtRound ?? 0)</p>
+                    </div>
+
+                    <form asp-action="Create" method="post">
+                        <input type="hidden" name="investmentId" value="@ViewBag.Investment.Id" />
+                        
+                        <div class="form-group">
+                            <label for="sharePercentage" class="control-label">Percentage of Shares to Sell</label>
+                            <input type="number" name="sharePercentage" class="form-control" 
+                                   step="0.01" min="0.01" max="@ViewBag.Investment.EquityPercent" 
+                                   placeholder="Enter percentage (0.01 - @ViewBag.Investment.EquityPercent)" required />
+                            <small class="form-text text-muted">
+                                You can sell between 0.01% and @ViewBag.Investment.EquityPercent.ToString("F2")% of your total equity.
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="askingPrice" class="control-label">Asking Price per Share</label>
+                            <input type="number" name="askingPrice" class="form-control" 
+                                   step="0.01" min="0.01" placeholder="Enter your asking price" required />
+                            <small class="form-text text-muted">
+                                This is the price you want per percentage point of equity.
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description" class="control-label">Description (Optional)</label>
+                            <textarea name="description" class="form-control" rows="3" 
+                                      placeholder="Add any additional information about this offer..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">List Shares for Sale</button>
+                            <a asp-controller="Investor" asp-action="Portfolio" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Selling Tips</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <strong>Pricing Strategy:</strong>
+                            <p class="small text-muted">Consider the current market price when setting your asking price. Competitive pricing may lead to faster sales.</p>
+                        </li>
+                        <li class="mb-2">
+                            <strong>Partial Sales:</strong>
+                            <p class="small text-muted">You can sell a portion of your shares and keep the rest for future growth.</p>
+                        </li>
+                        <li class="mb-2">
+                            <strong>Market Timing:</strong>
+                            <p class="small text-muted">Monitor company performance and market conditions when deciding to sell.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

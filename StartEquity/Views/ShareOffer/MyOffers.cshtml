@@ -1,0 +1,154 @@
+@{
+    ViewData["Title"] = "My Share Offers";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>My Share Offers</h2>
+            <p class="text-muted">Manage your share listings in the secondary market</p>
+        </div>
+        <div class="col-md-4 text-right">
+            <a asp-controller="Investor" asp-action="Portfolio" class="btn btn-success">My Portfolio</a>
+            <a asp-action="Index" class="btn btn-primary">Browse Market</a>
+        </div>
+    </div>
+
+    @if (ViewBag.MyOffers != null && ViewBag.MyOffers.Count > 0)
+    {
+        <div class="row">
+            @foreach (var offer in ViewBag.MyOffers)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">@offer.Company.Name</h5>
+                            <span class="badge badge-@(offer.Status == "Available" ? "success" : offer.Status == "Sold" ? "info" : "secondary")">
+                                @offer.Status
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-6">
+                                    <strong>Shares:</strong>
+                                </div>
+                                <div class="col-6">
+                                    @offer.SharePercentage.ToString("F2")%
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-6">
+                                    <strong>Asking Price:</strong>
+                                </div>
+                                <div class="col-6">
+                                    ₹@offer.AskingPrice.ToString("N2")
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-6">
+                                    <strong>Total Value:</strong>
+                                </div>
+                                <div class="col-6">
+                                    ₹@offer.TotalValue.ToString("N2")
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-6">
+                                    <strong>Market Price:</strong>
+                                </div>
+                                <div class="col-6">
+                                    ₹@offer.CurrentMarketPrice.ToString("N2")
+                                </div>
+                            </div>
+                           
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    Listed: @offer.CreatedAt.ToString("MM/dd/yyyy HH:mm")
+                                </small>
+                              
+                            </div>
+                            @if (offer.Status == "Sold" && offer.Buyer != null)
+                            {
+                                <div class="mb-2">
+                                    <strong>Buyer:</strong> @offer.Buyer.User.FullName
+                                </div>
+                            }
+                        </div>
+                        <div class="card-footer">
+                            @if (offer.Status == "Available")
+                            {
+                                <div class="row">
+                                    <div class="col-6">
+                                        <a asp-action="Details" asp-route-id="@offer.Id" class="btn btn-outline-primary btn-sm btn-block">
+                                            View Details
+                                        </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <form asp-action="Cancel" method="post" class="d-inline">
+                                            <input type="hidden" name="offerId" value="@offer.Id" />
+                                            <button type="submit" class="btn btn-outline-danger btn-sm btn-block" 
+                                                    onclick="return confirm('Are you sure you want to cancel this offer?')">
+                                                Cancel Offer
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a asp-action="Details" asp-route-id="@offer.Id" class="btn btn-outline-secondary btn-sm btn-block">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>No Share Offers</h4>
+                        <p class="text-muted">You haven't listed any shares for sale yet.</p>
+                        <p>Start by going to your portfolio and listing some of your shares for sale!</p>
+                        <a asp-controller="Investor" asp-action="Portfolio" class="btn btn-primary">View My Portfolio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Offer Status Guide</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5><span class="badge badge-success">Available</span></h5>
+                            <p>Your shares are listed and available for purchase by other investors. You can cancel the offer at any time.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5><span class="badge badge-info">Sold</span></h5>
+                            <p>Your shares have been purchased by another investor. The transaction is complete and you have received payment.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5><span class="badge badge-secondary">Cancelled</span></h5>
+                            <p>You have cancelled this offer. The shares are no longer available for purchase and remain in your portfolio.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,124 @@
+@model StartEquity.Models.Company
+
+@{
+    ViewData["Title"] = "Company Details";
+}
+
+<div class="container-fluid">
+    <h2>@Model.Name</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Company Information</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Description:</strong> @Model.Description</p>
+                    <p><strong>Category:</strong> @Model.Category?.Name</p>
+                    <p><strong>Total Raised:</strong> ₹@Model.TotalRaised.ToString("N2")</p>
+                    @{
+                        var rounds = Model.Rounds ?? new List<StartEquity.Models.Round>();
+                        var current = Model.CurrentRound;
+                        var currentId = current?.Id;
+                        var previousRounds = rounds.Where(r => currentId == null || r.Id != currentId);
+                        var dilutedPercent = previousRounds.Any() ? previousRounds.Sum(r => r.EquityTargetPercent) : 0m;
+                        
+                        if (current != null)
+                        {
+                            var currentTarget = current.ValuationAtRound * (current.EquityTargetPercent / 100m);
+                            if (current.RaisedAmount >= currentTarget)
+                            {
+                                dilutedPercent += current.EquityTargetPercent;
+                            }
+                        }
+                        var ownerOwnership = 100m - dilutedPercent;
+                        if (ownerOwnership < 0m) { ownerOwnership = 0m; }
+                    }
+                    <p><strong>Owner's Current Ownership:</strong> @ownerOwnership.ToString("F2")%</p>
+                    <p><strong>Status:</strong> 
+                        @if (Model.CanRaiseFunds)
+                        {
+                            <span class="badge badge-success">Can Raise Funds</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-warning">Restricted</span>
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Current Round</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.CurrentRound != null)
+                    {
+                        <p><strong>Round:</strong> @Model.CurrentRound.SequenceNumber</p>
+                        <p><strong>Valuation:</strong> ₹@Model.CurrentRound.ValuationAtRound.ToString("N2")</p>
+                        <p><strong>Equity Target:</strong> @Model.CurrentRound.EquityTargetPercent%</p>
+                        <p><strong>Raised:</strong> ₹@Model.CurrentRound.RaisedAmount.ToString("N2")</p>
+                        <p><strong>Status:</strong> 
+                            @if (Model.CurrentRound.RaisedAmount >= Model.CurrentRound.ValuationAtRound * (Model.CurrentRound.EquityTargetPercent / 100))
+                            {
+                                <span class="badge badge-success">Fully Funded</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-warning">In Progress</span>
+                            }
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No active round</p>
+                        <a asp-action="StartRound" asp-route-companyId="@Model.Id" class="btn btn-primary">Start New Round</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Investors</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Investor</th>
+                                    <th>Amount Invested</th>
+                                    <th>Equity %</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var investment in ViewBag.Investments)
+                                {
+                                    <tr>
+                                        <td>@(investment?.Investor?.User?.FullName ?? "-")</td>
+                                        <td>₹@investment.Amount.ToString("N2")</td>
+                                        <td>@investment.EquityPercent.ToString("F4")%</td>
+                                        <td>@investment.InvestmentDate.ToString("MM/dd/yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Back to Companies</a>
+    </div>
+</div>

@@ -1,0 +1,81 @@
+@model IEnumerable<StartEquity.Models.Transfer>
+
+@{
+    ViewData["Title"] = "Secondary Market";
+}
+
+<div class="container-fluid">
+    <h2>Secondary Market</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Create Transfer</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateTransfer" method="post">
+                        <div class="form-group">
+                            <label for="toInvestorEmail" class="control-label">To Investor (Email)</label>
+                            <input type="email" name="toInvestorEmail" class="form-control" placeholder="investor@example.com" />
+                        </div>
+                        <div class="form-group">
+                            <label for="equityPercent" class="control-label">Equity Percentage</label>
+                            <input type="number" name="equityPercent" class="form-control" step="0.01" min="0.01" max="100" />
+                        </div>
+                        <div class="form-group">
+                            <label for="price" class="control-label">Price per Share</label>
+                            <input type="number" name="price" class="form-control" step="0.01" min="0.01" />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Transfer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Transfer History</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Equity %</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var transfer in ViewBag.Transfers)
+                                {
+                                    <tr>
+                                        <td>@transfer.FromInvestor.User.FullName</td>
+                                        <td>@transfer.ToInvestor.User.FullName</td>
+                                        <td>@transfer.EquityPercent%</td>
+                                        <td>₹@transfer.Price.ToString("N2")</td>
+                                        <td>
+                                            <span class="badge badge-@(transfer.Status == "Completed" ? "success" : "warning")">
+                                                @transfer.Status
+                                            </span>
+                                        </td>
+                                        <td>@transfer.TransferDate.ToString("MM/dd/yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>

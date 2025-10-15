@@ -1,0 +1,42 @@
+@model StartEquity.Models.Company
+
+@{
+    ViewData["Title"] = "Start New Round";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3>Start New Round for @Model.Name</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="StartRound" method="post">
+                    <input type="hidden" name="companyId" value="@Model.Id" />
+                    
+                    <div class="alert alert-info">
+                        Remaining equity you can offer across all rounds: <strong>@((decimal)(ViewBag.RemainingEquity ?? 100m))%</strong>
+                        <br />Owner's current ownership: <strong>@((decimal)(ViewBag.OwnerOwnership ?? ViewBag.RemainingEquity ?? 100m))%</strong>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="valuation" class="control-label">Valuation at Round</label>
+                        <input type="number" name="valuation" class="form-control" step="0.01" min="0.01" required />
+                        <small class="form-text text-muted">Enter the company valuation for this round</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="equityTarget" class="control-label">Equity Target (%)</label>
+                        <input type="number" name="equityTarget" class="form-control" step="0.01" min="0.01" max="@((decimal)(ViewBag.RemainingEquity ?? 100m))" required />
+                        <small class="form-text text-muted">Enter the percentage of equity you want to raise. Max allowed: @((decimal)(ViewBag.RemainingEquity ?? 100m))</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Start Round</button>
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,125 @@
+@{
+    ViewData["Title"] = "My Portfolio";
+}
+
+<div class="container-fluid">
+    <h2>My Investment Portfolio</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Account Summary</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Current Balance:</strong> ₹@ViewBag.Investor.Balance.ToString("N2")</p>
+                    <p><strong>Total Investments:</strong> @ViewBag.Investments.Count</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Quick Actions</h4>
+                </div>
+                <div class="card-body">
+                    <a asp-controller="ShareOffer" asp-action="Index" class="btn btn-primary mr-2">Browse Secondary Market</a>
+                    <a asp-action="Index" class="btn btn-secondary">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>My Investments</h4>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Investments != null && ViewBag.Investments.Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Company</th>
+                                        <th>Investment Amount</th>
+                                        <th>Equity Percentage</th>
+                                        <th>Current Market Value</th>
+                                        <th>Investment Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var investment in ViewBag.Investments)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@investment.Company.Name</strong><br>
+                                                <small class="text-muted">@investment.Company.Description</small>
+                                            </td>
+                                            <td>₹@investment.Amount.ToString("N2")</td>
+                                            <td>@investment.EquityPercent.ToString("F2")%</td>
+                                            <td>
+                                                @{
+                                                    var currentValue = investment.Company.CurrentRound?.ValuationAtRound ?? 0;
+                                                    var marketValue = (currentValue * investment.EquityPercent) / 100;
+                                                }
+                                                ₹@marketValue.ToString("N2")
+                                            </td>
+                                            <td>@investment.InvestmentDate.ToString("MM/dd/yyyy")</td>
+                                            <td>
+                                                @if (investment.EquityPercent > 0)
+                                                {
+                                                    <a asp-controller="ShareOffer" asp-action="Create" asp-route-investmentId="@investment.Id" 
+                                                       class="btn btn-warning btn-sm">Sell Shares</a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">No shares to sell</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <h5>No Investments Yet</h5>
+                            <p>You haven't made any investments yet. Start by browsing available companies and making your first investment!</p>
+                            <a asp-action="Index" class="btn btn-primary">Browse Companies</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Secondary Market Activity</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>My Share Offers</h5>
+                            <p>View and manage your share listings in the secondary market</p>
+                            <a asp-controller="ShareOffer" asp-action="MyOffers" class="btn btn-info">My Offers</a>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>My Purchases</h5>
+                            <p>View shares you've purchased from other investors</p>
+                            <a asp-controller="ShareOffer" asp-action="MyPurchases" class="btn btn-success">My Purchases</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

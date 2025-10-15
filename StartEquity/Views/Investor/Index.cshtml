@@ -1,0 +1,139 @@
+@{
+    ViewData["Title"] = "Investor Dashboard";
+}
+
+<div class="container-fluid">
+    <h2>Investor Dashboard</h2>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Account Balance</h4>
+                </div>
+                <div class="card-body">
+                    <h3 class="text-success">₹@ViewBag.Investor.Balance.ToString("N2")</h3>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Investment Categories</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5>@category.Name</h5>
+                                        <p class="text-muted">@category.Description</p>
+                                        <a asp-action="Category" asp-route-categoryId="@category.Id" class="btn btn-primary">View Companies</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Available Companies</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Category</th>
+                                    <th>Valuation</th>
+                                    <th>Equity Target</th>
+                                    <th>Raised</th>
+                                    <th>Remaining</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var company in ViewBag.Companies)
+                                {
+                                    var targetAmt = (decimal)(company.CurrentRound?.TargetAmount ?? 0m);
+                                    var raisedAmt = (decimal)(company.CurrentRound?.RaisedAmount ?? 0m);
+                                    var remainingAmt = targetAmt - raisedAmt;
+                                    var inputMin = remainingAmt < 100m ? 1 : 100;
+                                    var inputStep = remainingAmt < 100m ? 1 : 100;
+                                    <tr>
+                                        <td>@company.Name</td>
+                                        <td>@company.Category?.Name</td>
+                                        <td>₹@company.CurrentRound?.ValuationAtRound.ToString("N2")</td>
+                                        <td>@company.CurrentRound?.EquityTargetPercent%</td>
+                                        <td>₹@company.CurrentRound?.RaisedAmount.ToString("N2")</td>
+                                        <td>
+                                            ₹@remainingAmt.ToString("N2")
+                                            @if (remainingAmt <= 0)
+                                            {
+                                                <span class="badge badge-success ml-2">Fully Funded</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <form asp-action="Invest" method="post" class="d-inline">
+                                                <input type="hidden" name="companyId" value="@company.Id" />
+                                                <div class="input-group">
+                                                    <input type="number" name="amount" class="form-control" placeholder="Amount" min="@inputMin" step="@inputStep" max="@remainingAmt" @(remainingAmt <= 0 ? "disabled" : null) />
+                                                    <div class="input-group-append">
+                                                        <button type="submit" class="btn btn-primary" @(remainingAmt <= 0 ? "disabled" : null)>Invest</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Secondary Market & Portfolio</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>My Portfolio</h5>
+                            <p>View your investments and sell shares</p>
+                            <a asp-action="Portfolio" class="btn btn-success">View Portfolio</a>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Secondary Market</h5>
+                            <p>Buy and sell shares from other investors</p>
+                            <a asp-controller="ShareOffer" asp-action="Index" class="btn btn-primary">Browse Market</a>
+                        </div>
+           
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

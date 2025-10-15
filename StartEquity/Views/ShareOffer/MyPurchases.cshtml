@@ -1,0 +1,136 @@
+@{
+    ViewData["Title"] = "My Purchases";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>My Share Purchases</h2>
+            <p class="text-muted">View shares you've purchased from other investors</p>
+        </div>
+        <div class="col-md-4 text-right">
+            <a asp-controller="Investor" asp-action="Portfolio" class="btn btn-success">My Portfolio</a>
+            <a asp-action="Index" class="btn btn-primary">Browse Market</a>
+        </div>
+    </div>
+
+    @if (ViewBag.MyPurchases != null && ViewBag.MyPurchases.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Shares Purchased</th>
+                        <th>Purchase Price</th>
+                        <th>Total Paid</th>
+                        <th>Seller</th>
+                        <th>Purchase Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var purchase in ViewBag.MyPurchases)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@purchase.Company.Name</strong><br>
+                                <small class="text-muted">@purchase.Company.Description</small>
+                            </td>
+                            <td>@purchase.SharePercentage.ToString("F2")%</td>
+                            <td>₹@purchase.AskingPrice.ToString("N2")</td>
+                            <td>₹@purchase.TotalValue.ToString("N2")</td>
+                            <td>@purchase.Seller.User.FullName</td>
+                            <td>@purchase.SoldAt?.ToString("MM/dd/yyyy HH:mm")</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@purchase.Id" class="btn btn-outline-primary btn-sm">
+                                    View Details
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Purchase Summary</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h5>Total Purchases</h5>
+                                <p class="text-primary h4">@ViewBag.MyPurchases.Count</p>
+                            </div>
+                            <div class="col-md-3">
+                                <h5>Total Investment</h5>
+                                @{
+                                    var totalInvested = ((IEnumerable<StartEquity.Models.ShareOffer>)ViewBag.MyPurchases).Sum(p => p.TotalValue);
+                                }
+                                <p class="text-success h4">₹@totalInvested.ToString("N2")</p>
+                            </div>
+                            <div class="col-md-3">
+                                <h5>Companies Owned</h5>
+                                @{
+                                    var uniqueCompanies = ((IEnumerable<StartEquity.Models.ShareOffer>)ViewBag.MyPurchases).Select(p => p.CompanyId).Distinct().Count();
+                                }
+                                <p class="text-info h4">@uniqueCompanies</p>
+                            </div>
+                            <div class="col-md-3">
+                                <h5>Total Equity</h5>
+                                @{
+                                    var totalEquity = ((IEnumerable<StartEquity.Models.ShareOffer>)ViewBag.MyPurchases).Sum(p => p.SharePercentage);
+                                }
+                                <p class="text-warning h4">@totalEquity.ToString("F2")%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>No Purchases Yet</h4>
+                        <p class="text-muted">You haven't purchased any shares from other investors yet.</p>
+                        <p>Browse the secondary market to find shares you'd like to purchase!</p>
+                        <a asp-action="Index" class="btn btn-primary">Browse Secondary Market</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Purchase Information</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>Immediate Ownership</h5>
+                            <p class="small text-muted">When you purchase shares, you immediately become a shareholder in the company. The shares appear in your portfolio right away.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Payment Processing</h5>
+                            <p class="small text-muted">Payment is deducted from your account balance immediately upon purchase. The seller receives the payment instantly.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Future Trading</h5>
+                            <p class="small text-muted">You can later sell these shares in the secondary market at your desired price, just like any other shares you own.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

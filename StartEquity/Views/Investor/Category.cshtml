@@ -1,0 +1,81 @@
+@model IEnumerable<StartEquity.Models.Company>
+
+@{
+    ViewData["Title"] = ViewBag.Category.Name + " Companies";
+}
+
+<div class="container-fluid">
+    <h2>@ViewBag.Category.Name Companies</h2>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    <p class="text-muted">@ViewBag.Category.Description</p>
+    
+    <div class="row">
+        @foreach (var company in ViewBag.Companies)
+        {
+            var targetAmt = (decimal)(company.CurrentRound?.TargetAmount ?? 0m);
+            var raisedAmt = (decimal)(company.CurrentRound?.RaisedAmount ?? 0m);
+            var remainingAmt = targetAmt - raisedAmt;
+            var inputMin = remainingAmt < 100m ? 1 : 100;
+            var inputStep = remainingAmt < 100m ? 1 : 100;
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@company.Name</h5>
+                        <p class="card-text">@company.Description</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Valuation:</strong> ₹@company.CurrentRound?.ValuationAtRound.ToString("N2")
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Equity Target:</strong> @company.CurrentRound?.EquityTargetPercent%
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <strong>Raised:</strong> ₹@company.CurrentRound?.RaisedAmount.ToString("N2")
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Status:</strong> 
+                                @if (company.CanRaiseFunds)
+                                {
+                                    <span class="badge badge-success">Open for Funding</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-warning">Restricted</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <strong>Remaining to Raise:</strong> ₹@remainingAmt.ToString("N2")
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <form asp-action="Invest" method="post">
+                                <input type="hidden" name="companyId" value="@company.Id" />
+                                <div class="input-group">
+                                    <input type="number" name="amount" class="form-control" placeholder="Investment Amount" min="@inputMin" step="@inputStep" max="@remainingAmt" @(remainingAmt <= 0 ? "disabled" : null) />
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-primary" @(remainingAmt <= 0 ? "disabled" : null)>Invest</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>

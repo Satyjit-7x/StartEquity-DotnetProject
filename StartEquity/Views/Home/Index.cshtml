@@ -1,0 +1,86 @@
+﻿@{
+    ViewData["Title"] = "StartEquity - Investment Platform";
+}
+
+<div class="jumbotron">
+    <h1 class="display-4">StartEquity</h1>
+    <p class="lead">The premier platform for startup investment and equity trading</p>
+    <hr class="my-4">
+    <p>Connect startups with investors and enable secondary market trading of equity shares.</p>
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="Register" role="button">Get Started</a>
+        <a class="btn btn-outline-primary btn-lg" asp-controller="Account" asp-action="Login" role="button">Login</a>
+    }
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">For Startups</h5>
+                <p class="card-text">Raise funds by offering equity to qualified investors. Set your valuation and funding targets.</p>
+                <ul class="list-unstyled">
+                    <li>✓ Create funding rounds</li>
+                    <li>✓ Track investor interest</li>
+                    <li>✓ Manage equity distribution</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">For Investors</h5>
+                <p class="card-text">Discover and invest in promising startups across various categories and industries.</p>
+                <ul class="list-unstyled">
+                    <li>✓ Browse by category</li>
+                    <li>✓ Invest in startups</li>
+                    <li>✓ Trade secondary shares</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Investment Categories</h5>
+                <p class="card-text">Diverse investment opportunities across multiple sectors.</p>
+                <ul class="list-unstyled">
+                    <li>• EdTech</li>
+                    <li>• FinTech</li>
+                    <li>• Aerospace</li>
+                    <li>• HealthTech</li>
+                    <li>• CleanTech</li>
+                    <li>• And more...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Quick Actions</h4>
+                </div>
+                <div class="card-body">
+                    @if (User.IsInRole("Investor"))
+                    {
+                        <a asp-controller="Investor" asp-action="Index" class="btn btn-primary">Go to Dashboard</a>
+                        <a asp-controller="Investor" asp-action="Transfers" class="btn btn-outline-primary">Secondary Market</a>
+                    }
+                    @if (User.IsInRole("Owner"))
+                    {
+                        <a asp-controller="Company" asp-action="Index" class="btn btn-primary">My Companies</a>
+                        <a asp-controller="Company" asp-action="Create" class="btn btn-outline-primary">Add Company</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
