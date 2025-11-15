@@ -1,6 +1,8 @@
 StartEquity
 Democratizing Startup Investing. Powering the next generation of innovators.
 
+VIDEO OF PROJECT DEMONSTRATION : https://www.youtube.com/watch?v=_JXaH2dWNFo
+
 StartEquity is a .NET Core application designed to bridge the gap between innovative startups seeking capital and everyday investors. Our platform empowers emerging companies to raise funds by diluting equity through various funding rounds, while simultaneously allowing individuals to invest in private ventures with minimal capital.
 
 A key feature of StartEquity is its secondary marketplace, which provides liquidity by enabling investors to sell their shares to other users on the platform.
